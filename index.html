@@ -1,3 +1,93 @@
+<html>
+<head>
+<link rel="stylesheet" href="style.css">
+<title>Back to the Future - Radio</title>
+<style type="text/css">
+/* https://codepen.io/KristopherVanSant/pen/dXdVJY */
+@font-face {
+  font-family: 'lcd';
+  src: url('alarm-clock.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'dymo';
+  src: url('microgramma.ttf') format('truetype');
+e}
+@font-face {
+  font-family: 'dymo-bold';
+  src: url('microgramma-bold.otf') format('opentype');
+e}
+body {
+  filter: blur(0.5px);
+  cursor: default;
+  user-select: none;
+}
+#overlay {
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: black;
+  z-index: 1;
+}
+#overlay.white {
+  background: white;
+}
+#tfc {
+  cursor: pointer;
+}
+.container {
+  width: 640px;
+  font-family: 'lcd', sans-serif;
+}
+.label, .large-label {
+  font-family: dymo;
+  padding: 0 2px 0 2px;
+  font-size: 14px;
+  opacity: 0.75;
+  letter-spacing: 1px;
+}
+.large-label {
+  font-family: dymo-bold;
+  width: 40%;
+}
+.box3 .large-label {
+  width: 45%;
+}
+.display {
+  /*text-shadow: 0 -2px 3px;*/
+  text-shadow: 0 0 10px;
+  padding-left: 4px;
+  letter-spacing: 0;
+  font-size: 48px;
+}
+.faded-eights {
+  position: relative;
+  top: -105px;
+  left: 2px;
+  opacity: 0.2;
+  background: 0 none;
+  border: 0 none;
+}
+.time {
+  margin-top: 332%;
+  margin-bottom: -263%;
+}
+.lit, .unlit {
+  border-top: 1px solid white;
+}
+.lit {
+  background: #f1ac17;
+  box-shadow: 0px 0px 3px yellow;
+}
+.green .lit {
+  background: #4cd338;
+  box-shadow: 0px 0px 3px #4cd338;
+}
+</style>
+</head>
+<body>
 <div class="container">
   <div class="spacer"></div>
   <div class="box box1">
@@ -106,3 +196,5 @@
     <p></p>
   </div>
 </div>
+</body>
+</html>
