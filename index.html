@@ -86,6 +86,155 @@ body {
   box-shadow: 0px 0px 3px #4cd338;
 }
 </style>
+<script type="text/javascript">
+// Dynamic date/time.
+var time = setInterval(function() {
+  var now = new Date();
+  const dateArray = [
+    now.getFullYear(),    // Year
+    now.toLocaleString('en-US', { month: 'short' }),
+    //now.getMonth() + 1,   // Month (1–12)
+    now.getDate(),        // Day of the month
+    now.getHours(),       // Hour (0–23)
+    now.getMinutes()      // Minute (0–59)
+  ];
+
+  var minute = document.querySelector('.now-min');
+  minute.innerHTML = String(dateArray[4]).padStart(2, '0');
+  var hour = document.querySelector('.now-hour');
+  var hours = dateArray[3];
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  var am = document.querySelector('.now-am');
+  var pm = document.querySelector('.now-pm');
+  if (ampm == 'AM') {
+    am.classList.add('lit');
+    am.classList.remove('unlit');
+    pm.classList.add('unlit');
+    pm.classList.remove('lit');
+  }
+  else {
+    pm.classList.add('lit');
+    pm.classList.remove('unlit');
+    am.classList.add('unlit');
+    am.classList.remove('lit');
+  }
+  hours = hours % 12;
+  hours = hours ? hours : 12; // Handle midnight (0 hours → 12)
+  hour.innerHTML = String(hours).padStart(2, '0');
+  var year = document.querySelector('.now-year');
+  year.innerHTML = dateArray[0];
+  var day = document.querySelector('.now-day');
+  day.innerHTML = String(dateArray[2]).padStart(2, '0');
+  var month = document.querySelector('.now-month');
+  month.innerHTML = dateArray[1];
+
+  // Blinking dots.
+  var colon = document.querySelectorAll('.time');
+  for (var dot of colon) {
+    if (dot.classList.contains('lit')) {
+      dot.classList.remove('lit');
+      dot.classList.add('unlit');
+    }
+    else {
+      dot.classList.remove('unlit');
+      dot.classList.add('lit');
+    }
+  }
+}, 500);
+
+// Load.
+window.addEventListener("load", function() {
+
+  // time circuits on
+  tfc.addEventListener("click", function() {
+    // play sound
+    player.src = 'assets/general/timeCircuits/tfcOn.wav';
+    player.play();
+    // enable all displays except month
+    var x = document.querySelectorAll(".display");
+
+    // fade in months top to bottom
+  });
+
+  // typing digits alters top row
+  var counter = 0;
+  var timer;
+  var tmp;
+  document.addEventListener("keypress", function(e) {
+    e.preventDefault();
+
+    var month = document.querySelector('.then-month');
+    var day = document.querySelector('.then-day');
+    var year = document.querySelector('.then-year');
+
+    if (!isFinite(e.key)) {
+      return;
+    }
+
+    // setTimeout wait for 8 keys
+    clearTimeout(timer);
+    timer = setTimeout(function() {
+      counter = 0;
+    }, 3000);
+
+    // shift
+    //var tmp = year.innerHTML;
+    //var arr = [...tmp];
+    if (counter == 0) {
+      tmp = [
+        '&nbsp;',
+        '&nbsp;',
+        '&nbsp;',
+        '&nbsp;',
+        '&nbsp;',
+        '&nbsp;',
+        '&nbsp;',
+        '&nbsp;',
+      ];
+    }
+    tmp[counter] = e.key;
+
+    if (counter == 1) {
+      var m = tmp.slice(0, 2).join('');
+      var date = new Date('1985-' + m + '-01T00:00:00');
+      if (date == "Invalid Date") {
+        counter = 0;
+        return;
+      }
+      var out = date.toLocaleString('en-US', { month: 'short' });
+      month.innerHTML = out;
+    }
+    else if (counter == 3) {
+console.log(tmp);
+      var m = tmp.slice(0, 2).join('');
+      var d = tmp.slice(2, 4).join('');
+      var date = new Date('1985-' + m + '-' + d + 'T00:00:00');
+console.log(date);
+      if (date == "Invalid Date") {
+        counter = 0;
+        return;
+      }
+      day.innerHTML = d;
+    }
+    else if (counter == 7) {
+      var m = tmp.slice(0, 2).join('');
+      var d = tmp.slice(2, 4).join('');
+      var y = tmp.slice(4, 8).join('');
+      year.innerHTML = y;
+    }
+
+    // count keys
+console.log({counter});
+    counter++;
+    if (counter > 7) {
+      counter = 0;
+    }
+  });
+
+  // ready radio
+    // switch through static?
+});
+</script>
 </head>
 <body>
 <div class="container">
