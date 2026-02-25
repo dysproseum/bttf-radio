@@ -6,6 +6,8 @@ from urllib.parse import urlparse, parse_qs
 from plexapi.server import PlexServer
 from dotenv import load_dotenv
 import os
+import random
+import json
 
 load_dotenv(override=True)
 baseurl = os.getenv('PLEX_BASEURL')
@@ -19,22 +21,56 @@ class DateHTTPRequestHandler(BaseHTTPRequestHandler):
     param_value = query_params.get(key, [None])[0]
     return param_value
 
-  def do_GET(self):
-    # Set response status code and headers
-    self.send_response(200)
-    self.send_header('Content-type', 'text/html')
-    self.send_header("Access-Control-Allow-Origin", "*")
-    #self.send_header('Date', formatdate(time.time(), usegmt=True))
-    self.end_headers()
+  def get_segments(self):
+    parsed_path = urlparse(self.path)
+    path_segments = parsed_path.path.strip('/').split('/')
+    return path_segments
 
+  def get_year(self):
+    path_segments = self.get_segments()
+    if len(path_segments) > 1 and path_segments[0] == 'year':
+      return path_segments[1]
+    else:
+      return self.get_param('y')
+
+  def do_GET(self):
     # Get param for year
-    year = self.get_param('y')
+    year = self.get_year()
+    if year is None:
+      self.send_response(500)
+      self.end_headers()
+      self.wfile.write(f"<h1>No year specified</h1>".encode())
+      return
     #self.wfile.write(f"<h1>Current Year: {year}</h1>".encode())
+    year = int(year)
+    print(f"Year: {year}")
 
     # Query for songs
     plex = PlexServer(baseurl, token)
     music = plex.library.section(library)
+    results = []
     results = music.search(year=year)
+    print(f"Results for {year}: {len(results)}")
+
+    # Retry if no results
+    while len(results) < 1 and year > 1900:
+      year -= 1
+      results = music.search(year=year)
+      print(f"Results for {year}: {len(results)}")
+
+    if len(results) == 0:
+      self.send_response(404)
+      self.end_headers()
+      return
+
+    # Set response status code and headers
+    self.send_response(200)
+    self.send_header('Content-type', 'text/plain')
+    self.send_header("Access-Control-Allow-Origin", "*")
+    #self.send_header('Date', formatdate(time.time(), usegmt=True))
+    self.end_headers()
+
+    urls = []
     for result in results:
       #self.wfile.write(f"<h2>{result.TYPE} result: {result.title}</h2>".encode())
       if result.TYPE == "artist":
@@ -50,7 +86,11 @@ class DateHTTPRequestHandler(BaseHTTPRequestHandler):
               for obj in track.media:
                 stream_url = track.getStreamURL()
                 #self.wfile.write(f"<h6>{track.trackNumber}: {track.title} {track.getStreamURL()}</h6>".encode())
-                self.wfile.write(f"{track.getStreamURL()}".encode())
+                #self.wfile.write(f"{track.getStreamURL()}".encode())
+                urls.append(track.getStreamURL())
+
+    random.shuffle(urls)
+    self.wfile.write(json.dumps(urls).encode())
 
 # Create HTTPS server
 port = os.getenv('PORT')
