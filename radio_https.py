@@ -34,6 +34,36 @@ class DateHTTPRequestHandler(BaseHTTPRequestHandler):
       return self.get_param('y')
 
   def do_GET(self):
+
+    # Try to be a web server too
+    if not self.path.startswith('/year'):
+      try:
+        # fonts/audio
+        if self.path.startswith('/assets'):
+          self.path = self.path.replace('%20', ' ')
+          file_to_open = open(self.path[1:], mode='rb').read()
+          self.send_response(200)
+          self.send_header('Content-type', 'font/ttf')
+          self.end_headers()
+          self.wfile.write(file_to_open)
+          return
+
+        # html/css
+        if self.path == '/':
+          self.path = '/index.html'  # Serve a specific file
+        file_to_open = open(self.path[1:]).read()
+        self.send_response(200)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
+        self.wfile.write(file_to_open.encode())
+        return
+      except:
+        file_to_open = "File not found"
+        self.send_response(404)
+        self.end_headers()
+        self.wfile.write(file_to_open.encode())
+        return
+
     # Get param for year
     year = self.get_year()
     if year is None:
